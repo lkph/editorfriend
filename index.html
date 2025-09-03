@@ -7,175 +7,176 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #5D5D81; /* 차분한 남색 계열 (삭제 버튼에 적용될 색상) */
-            --secondary-color: #BFCDE0;
-            --background-color: #F7F9FC;
-            --font-color: #333333;
-            --white-color: #FFFFFF;
-            --border-radius: 12px;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<style>
+    :root {
+        --primary-color: #5D5D81; /* 차분한 남색 계열 (삭제 버튼에 적용될 색상) */
+        --secondary-color: #BFCDE0;
+        --background-color: #F7F9FC;
+        --font-color: #333333;
+        --white-color: #FFFFFF;
+        --border-radius: 12px;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--font-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--font-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-        #app-container {
-            width: 100%;
-            max-width: 800px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+    #app-container {
+        width: 100%;
+        max-width: 800px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
 
-        #navbar {
-            background-color: var(--white-color);
-            border-radius: var(--border-radius);
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: nowrap;
-            overflow-x: hidden; /* <<-- 1. 스크롤바 제거 */
-        }
+    #navbar {
+        background-color: var(--white-color);
+        border-radius: var(--border-radius);
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: nowrap;
+        overflow-x: hidden;
+    }
 
-        #navbar a {
-            display: block;
-            color: var(--primary-color);
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: background-color 0.3s, color 0.3s;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+    #navbar a {
+        display: block;
+        color: var(--primary-color);
+        text-align: center;
+        padding: 14px 20px;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.3s, color 0.3s;
+        cursor: pointer;
+        white-space: nowrap;
+    }
 
-        #navbar a:hover, #navbar a.active {
-            background-color: var(--primary-color);
-            color: var(--white-color);
-        }
-        
-        #navbar a.brand {
-            font-weight: 700;
-        }
+    #navbar a:hover, #navbar a.active {
+        background-color: var(--primary-color);
+        color: var(--white-color);
+    }
+    
+    #navbar a.brand {
+        font-weight: 700;
+    }
 
-        #content {
-            background-color: var(--white-color);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            text-align: center;
-        }
-        
-        .page { display: none; }
-        .page.active { display: block; }
-        h1, h2 { color: var(--primary-color); }
-        h1 { margin-bottom: 30px; }
-        h2 { margin-bottom: 20px; }
+    #content {
+        background-color: var(--white-color);
+        padding: 30px;
+        border-radius: var(--border-radius);
+        text-align: center;
+    }
+    
+    .page { display: none; }
+    .page.active { display: block; }
+    h1, h2 { color: var(--primary-color); }
+    h1 { margin-bottom: 30px; }
+    h2 { margin-bottom: 20px; }
 
-.buttons-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start; /* 'left' 대신 'flex-start'를 사용합니다. */
-    gap: 15px;
-    margin-bottom: 20px;
-}
-/* 버튼 컨테이너의 모든 자식 요소에 너비를 적용하는 규칙 */
-.buttons-container > * {
-    width: calc((100% - 60px) / 5); /* (전체너비 - 총 여백) / 5 */
-}
+    .buttons-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .buttons-container > * {
+        width: calc((100% - 60px) / 5);
+    }
 
-        hr {
-            border: 0;
-            height: 1px;
-            background: #e0e0e0;
-            margin: 30px 0;
-        }
+    hr {
+        border: 0;
+        height: 1px;
+        background: #e0e0e0;
+        margin: 30px 0;
+    }
 
-        button {
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 500;
-            color: var(--primary-color);
-            background-color: transparent;
-            border: 2px solid var(--secondary-color);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .copy-button {
-            font-size: 22px;
-            padding: 12px 20px;
-        }
-        
-        .copy-button:hover {
-            background-color: var(--primary-color);
-            color: var(--white-color);
-            border-color: var(--primary-color);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
+    button {
+        font-family: 'Noto Sans KR', sans-serif;
+        font-weight: 500;
+        color: var(--primary-color);
+        background-color: transparent;
+        border: 2px solid var(--secondary-color);
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .copy-button {
+        font-size: 22px;
+        padding: 12px 20px;
+    }
+    
+    .copy-button:hover {
+        background-color: var(--primary-color);
+        color: var(--white-color);
+        border-color: var(--primary-color);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
 
-        .custom-button-wrapper {
-            position: relative;
-        }
-        
-        .remove-btn {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: var(--primary-color); /* <<-- 2. 삭제 버튼 색상 변경 */
-            color: white;
-            border: 2px solid white;
-            font-size: 14px;
-            font-weight: bold;
-            line-height: 1;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+    .custom-button-wrapper {
+        position: relative;
+    }
+    
+    .remove-btn {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        border: 2px solid white;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 1;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
 
-        #add-button {
-            font-size: 22px;
-            padding: 12px 20px;
-            border-style: dashed;
-        }
-        
-        #add-button:hover {
-            background-color: #E8F5E9;
-            border-color: #4CAF50;
-            color: #4CAF50;
-        }
-        
-        #text-input { width: 100%; height: 200px; padding: 15px; box-sizing: border-box; border: 2px solid var(--secondary-color); border-radius: var(--border-radius); font-size: 16px; font-family: 'Noto Sans KR', sans-serif; resize: vertical; margin-bottom: 20px; }
-        #special-char-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        #special-char-buttons button { font-size: 18px; padding: 8px 15px; min-width: 50px; }
-        #counter-results { display: flex; justify-content: space-around; padding: 20px; background-color: #F7F9FC; border-radius: var(--border-radius); }
-        .result-item { text-align: center; }
-        .result-item .label { font-size: 14px; color: #555; }
-        .result-item .count { font-size: 24px; font-weight: 700; color: var(--primary-color); }
+    #add-button {
+        font-size: 22px;
+        padding: 12px 20px;
+        border-style: dashed;
+    }
+    
+    #add-button:hover {
+        background-color: #E8F5E9;
+        border-color: #4CAF50;
+        color: #4CAF50;
+    }
+    
+    #text-input { width: 100%; height: 200px; padding: 15px; box-sizing: border-box; border: 2px solid var(--secondary-color); border-radius: var(--border-radius); font-size: 16px; font-family: 'Noto Sans KR', sans-serif; resize: vertical; margin-bottom: 20px; }
+    #special-char-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+    #special-char-buttons button { font-size: 18px; padding: 8px 15px; min-width: 50px; }
+    #counter-results { display: flex; justify-content: space-around; padding: 20px; background-color: #F7F9FC; border-radius: var(--border-radius); }
+    .result-item { text-align: center; }
+    .result-item .label { font-size: 14px; color: #555; }
+    .result-item .count { font-size: 24px; font-weight: 700; color: var(--primary-color); }
 
-        #guide { margin-top: 40px; padding: 20px; background-color: #F0F4F8; border-radius: var(--border-radius); text-align: left; line-height: 1.8; color: #555; }
-        #guide p { font-weight: 500; color: var(--primary-color); margin-top: 0; }
-        footer { text-align: center; margin-top: 40px; padding-bottom: 20px; font-size: 14px; color: #888; }
-        
-        @media (max-width: 820px) {
-            #navbar { flex-wrap: wrap; }
-        }
-    </style>
+    #guide { margin-top: 40px; padding: 20px; background-color: #F0F4F8; border-radius: var(--border-radius); text-align: left; line-height: 1.8; color: #555; }
+    #guide p { font-weight: 500; color: var(--primary-color); margin-top: 0; }
+    footer { text-align: center; margin-top: 40px; padding-bottom: 20px; font-size: 14px; color: #888; }
+    
+    @media (max-width: 820px) {
+        #navbar { flex-wrap: wrap; }
+    }
+</style>
+
 </head>
 <body>
     <div id="app-container">
