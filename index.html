@@ -82,17 +82,17 @@
     h2 { margin-bottom: 20px; }
 
     .buttons-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    
-.buttons-container > * {
-    flex-grow: 1; /* 남는 공간을 채우도록 설정 (선택 사항) */
-    max-width: calc((100% - 60px) / 5); /* 최대 너비를 제한 */
-}
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+    .buttons-container > * {
+            flex: 0 0 calc((100% - 60px) / 5); /* flex-basis로 정확한 크기 설정 */
+            min-width: 0; /* 텍스트 오버플로우 방지 */
+        }
 
     hr {
         border: 0;
@@ -370,6 +370,7 @@ function initializeSymbolCopyPage() {
     </script>
 </body>
 </html>
+
 
 
 
