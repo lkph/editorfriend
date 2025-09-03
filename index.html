@@ -41,11 +41,11 @@
             background-color: var(--white-color);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            overflow: hidden;
             margin-bottom: 30px;
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: auto;
         }
 
         #navbar a {
@@ -57,6 +57,7 @@
             font-weight: 500;
             transition: background-color 0.3s, color 0.3s;
             cursor: pointer;
+            white-space: nowrap;
         }
 
         #navbar a:hover, #navbar a.active {
@@ -76,256 +77,83 @@
             text-align: center;
         }
         
-        .page {
-            display: none; /* 모든 페이지는 기본적으로 숨김 */
-        }
-        
-        .page.active {
-            display: block; /* active 클래스가 있는 페이지만 표시 */
-        }
-        
-        h1, h2 {
-            color: var(--primary-color);
-        }
-        
+        .page { display: none; }
+        .page.active { display: block; }
+        h1, h2 { color: var(--primary-color); }
         h1 { margin-bottom: 30px; }
         h2 { margin-bottom: 20px; }
 
-        #buttons-container {
+        .buttons-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background: #e0e0e0;
+            margin: 30px 0;
         }
 
         button {
-            font-size: 22px;
             font-family: 'Noto Sans KR', sans-serif;
             font-weight: 500;
             color: var(--primary-color);
             background-color: transparent;
             border: 2px solid var(--secondary-color);
             border-radius: var(--border-radius);
-            padding: 12px 20px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        button:hover {
+        
+        .copy-button {
+            font-size: 22px;
+            padding: 12px 20px;
+        }
+        
+        .copy-button:hover {
             background-color: var(--primary-color);
             color: var(--white-color);
             border-color: var(--primary-color);
             transform: translateY(-3px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
-        
-        /* 글자 수 계산기 스타일 */
-        #text-input {
-            width: 100%;
-            height: 200px;
-            padding: 15px;
-            box-sizing: border-box;
-            border: 2px solid var(--secondary-color);
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            font-family: 'Noto Sans KR', sans-serif;
-            resize: vertical;
-            margin-bottom: 20px;
+
+        /* --- 사용자 추가 버튼 관련 스타일 --- */
+        .custom-button-wrapper {
+            position: relative;
         }
         
-        #special-char-buttons {
+        .remove-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #ff5c5c;
+            color: white;
+            border: 2px solid white;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1;
+            padding: 0;
             display: flex;
+            align-items: center;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        
-        #special-char-buttons button {
-            font-size: 18px;
-            padding: 8px 15px;
-            min-width: 50px;
-        }
-        
-        #counter-results {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px;
-            background-color: #F7F9FC;
-            border-radius: var(--border-radius);
-        }
-        
-        .result-item {
-            text-align: center;
-        }
-        
-        .result-item .label {
-            font-size: 14px;
-            color: #555;
-        }
-        
-        .result-item .count {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        #guide {
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #F0F4F8;
-            border-radius: var(--border-radius);
-            text-align: left;
-            line-height: 1.8;
-            color: #555;
+        #add-button {
+            font-size: 22px;
+            padding: 12px 20px;
+            border-style: dashed;
         }
         
-        #guide p {
-            font-weight: 500;
-            color: var(--primary-color);
-            margin-top: 0;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-bottom: 20px;
-            font-size: 14px;
-            color: #888;
-        }
-
-    </style>
-</head>
-<body>
-    <div id="app-container">
-        <div id="navbar">
-            <a class="brand" onclick="showPage('편친', this)">기호 복사</a>
-            <a href="https://nara-speller.co.kr/speller/" target="_blank">맞춤법 검사기</a>
-            <a onclick="showPage('counter', this)">글자수 계산기</a>
-            <a href="https://stdict.korean.go.kr/main/main.do" target="_blank">표준국어대사전</a>
-            <a href="http://www.kpipa.or.kr/main/main.do" target="_blank">진흥원</a>
-            <a href="https://www.yes24.com" target="_blank">yes24</a>
-            <a href="https://chatgpt.com" target="_blank">ChatGPT</a>
-        </div>
-
-        <div id="content">
-            <div id="편친" class="page">
-                <h1>원하는 기호를 클릭하여 복사하세요</h1>
-                <div id="buttons-container"></div>
-            </div>
-            
-            <div id="counter" class="page">
-                <h2>글자수 계산기</h2>
-                <textarea id="text-input" placeholder="여기에 텍스트를 붙여넣으세요..."></textarea>
-                
-                <div id="special-char-buttons"></div>
-                
-                <div id="counter-results">
-                    <div class="result-item">
-                        <div class="label">공백 포함</div>
-                        <div class="count" id="char-count-space">0</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="label">공백 제외</div>
-                        <div class="count" id="char-count-no-space">0</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="label">단어 수</div>
-                        <div class="count" id="word-count">0</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="guide">
-            <p>각 문장 부호의 일반적인 쓰임새는 아래와 같습니다.</p>
-            - 겹낫표(『 』): 책 제목 (단행본, 장편 소설 등)<br/>
-            - 겹화살괄호(《 》): 신문, 잡지 등 정기 간행물<br/>
-            - 홑낫표(｢ ｣): 짧은 글 (논문, 기사, 단편 소설 등)<br/>
-            - 홑화살괄호(〈 〉): 예술 작품 (영화, 연극, 음악 등)
-        </div>
-    </div>
-    
-    <footer>
-        <p>Copyright &copy; 2024. leekim. All rights reserved.<br><strong>편집자의 친구, 편친</strong></p>
-    </footer>
-
-    <script>
-        // --- 초기화 ---
-        document.addEventListener("DOMContentLoaded", function() {
-            // 페이지 1: 기호 복사 버튼 생성
-            const unicodeChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
-            const buttonsContainer = document.getElementById('buttons-container');
-            unicodeChars.forEach(char => createCopyButton(char, buttonsContainer));
-            
-            // 페이지 2: 글자 수 계산기 기능 초기화
-            const specialChars = ['『', '』', '〈', '〉', '《', '》', '｢', '｣'];
-            const specialCharButtonsContainer = document.getElementById('special-char-buttons');
-            specialChars.forEach(char => createCopyButton(char, specialCharButtonsContainer));
-            
-            const textInput = document.getElementById('text-input');
-            textInput.addEventListener('input', updateCounts);
-            
-            // 첫 페이지 활성화
-            showPage('편친', document.querySelector('#navbar a.brand'));
-        });
-
-        // --- 공통 함수 ---
-        function createCopyButton(char, container) {
-            const button = document.createElement('button');
-            button.textContent = char;
-            button.onclick = (e) => {
-                copyToClipboard(char);
-                const originalText = e.target.textContent;
-                e.target.textContent = '복사!';
-                setTimeout(() => {
-                    e.target.textContent = originalText;
-                }, 1000);
-            };
-            container.appendChild(button);
-        }
-
-        function copyToClipboard(char) {
-            navigator.clipboard.writeText(char).catch(err => {
-                console.error('클립보드 복사 실패:', err);
-                // 구형 브라우저 대체
-                const textarea = document.createElement('textarea');
-                textarea.value = char;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-            });
-        }
-        
-        function showPage(pageId, element) {
-            // 모든 페이지 숨기기
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            // 클릭된 페이지만 보이기
-            document.getElementById(pageId).classList.add('active');
-            
-            // 네비게이션 활성화 스타일
-            document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active'));
-            if (element) {
-                element.classList.add('active');
-            }
-        }
-        
-        // --- 글자 수 계산기 함수 ---
-        function updateCounts() {
-            const text = document.getElementById('text-input').value;
-            
-            // 1. 글자 수 (공백 포함)
-            document.getElementById('char-count-space').textContent = text.length;
-            
-            // 2. 글자 수 (공백 제외)
-            const noSpaceText = text.replace(/\s/g, '');
-            document.getElementById('char-count-no-space').textContent = noSpaceText.length;
-            
-            // 3. 단어 수
-            const words = text.trim().split(/\s+/).filter(word => word !== '');
-            document.getElementById('word-count').textContent = words[0] === '' ? 0 : words.length;
-        }
-    </script>
-</body>
-</html>
+        #add-button:hover {
+            background-color: #E8F5E9; /* 연한 녹색 */
+            border-color: #4CAF50; /* 진한 녹색 */
+            color: #4CAF50;
