@@ -187,7 +187,7 @@
 
         <div id="content">
             <div id="편친" class="page">
-                <h1>원하는 기호를 클릭하여 복사하세요</h1>
+                <h1>원하는 기호를 클릭해 복사하세요</h1>
                 <div id="default-buttons-container" class="buttons-container"></div>
                 <hr>
                 <h2>원하는 기호를 추가하세요</h2>
@@ -235,15 +235,36 @@
             showPage('편친', document.querySelector('#navbar a.brand'));
         });
         
-        function initializeSymbolCopyPage() {
-            const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
-            const defaultContainer = document.getElementById('default-buttons-container');
-            defaultChars.forEach(char => {
-                const button = createCopyButton(char);
-                defaultContainer.appendChild(button);
-            });
-            loadCustomButtons();
-        }
+function initializeSymbolCopyPage() {
+            const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
+            
+            // 1. 각 기호의 이름을 객체 형태로 저장합니다.
+            const symbolNames = {
+                '『』': '겹낫표',
+                '〈〉': '홑화살괄호',
+                '《》': '겹화살괄호',
+                '｢｣': '홑낫표',
+                '“”': '큰따옴표',
+                '‘’': '작은따옴표',
+                '·': '가운뎃점',
+                '–': '붙임표 (En Dash)',
+                '—': '줄표 (Em Dash)',
+                '…': '말줄임표'
+            };
+
+            const defaultContainer = document.getElementById('default-buttons-container');
+            defaultChars.forEach(char => {
+                const button = createCopyButton(char);
+                
+                // 2. 버튼이 만들어질 때, title 속성에 기호 이름을 넣어줍니다.
+                if (symbolNames[char]) {
+                    button.title = symbolNames[char];
+                }
+
+                defaultContainer.appendChild(button);
+            });
+            loadCustomButtons();
+        }
 
         function createCopyButton(char, isCustom = false) {
             const button = document.createElement('button');
@@ -343,4 +364,5 @@
     </script>
 </body>
 </html>
+
 
