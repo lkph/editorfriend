@@ -84,11 +84,15 @@
 .buttons-container {
     display: flex;
     flex-wrap: wrap;
-    grid-template-columns: repeat(5, 1fr);
-    justify-content: left;
+    justify-content: flex-start; /* 'left' 대신 'flex-start'를 사용합니다. */
     gap: 15px;
     margin-bottom: 20px;
 }
+/* 버튼 컨테이너의 모든 자식 요소에 너비를 적용하는 규칙 */
+.buttons-container > * {
+    width: calc((100% - 60px) / 5); /* (전체너비 - 총 여백) / 5 */
+}
+
         hr {
             border: 0;
             height: 1px;
@@ -364,6 +368,7 @@ function initializeSymbolCopyPage() {
     </script>
 </body>
 </html>
+
 
 
 
