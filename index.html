@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #5D5D81;
+            --primary-color: #5D5D81; /* 차분한 남색 계열 (삭제 버튼에 적용될 색상) */
             --secondary-color: #BFCDE0;
             --background-color: #F7F9FC;
             --font-color: #333333;
@@ -45,7 +45,7 @@
             display: flex;
             justify-content: center;
             flex-wrap: nowrap;
-            overflow-x: auto;
+            overflow-x: hidden; /* <<-- 1. 스크롤바 제거 */
         }
 
         #navbar a {
@@ -122,7 +122,6 @@
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
-        /* --- 사용자 추가 버튼 관련 스타일 --- */
         .custom-button-wrapper {
             position: relative;
         }
@@ -134,7 +133,7 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background-color: #ff5c5c;
+            background-color: var(--primary-color); /* <<-- 2. 삭제 버튼 색상 변경 */
             color: white;
             border: 2px solid white;
             font-size: 14px;
@@ -154,12 +153,11 @@
         }
         
         #add-button:hover {
-            background-color: #E8F5E9; /* 연한 녹색 */
-            border-color: #4CAF50; /* 진한 녹색 */
+            background-color: #E8F5E9;
+            border-color: #4CAF50;
             color: #4CAF50;
         }
         
-        /* 글자 수 계산기 스타일 (이전과 동일) */
         #text-input { width: 100%; height: 200px; padding: 15px; box-sizing: border-box; border: 2px solid var(--secondary-color); border-radius: var(--border-radius); font-size: 16px; font-family: 'Noto Sans KR', sans-serif; resize: vertical; margin-bottom: 20px; }
         #special-char-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
         #special-char-buttons button { font-size: 18px; padding: 8px 15px; min-width: 50px; }
@@ -173,17 +171,17 @@
         footer { text-align: center; margin-top: 40px; padding-bottom: 20px; font-size: 14px; color: #888; }
         
         @media (max-width: 820px) {
-            #navbar { flex-wrap: wrap; overflow-x: hidden; }
+            #navbar { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="navbar">
-            <a class="brand" onclick="showPage('편친', this)">기호 복사</a>
-            <a href="https://nara-speller.co.kr/speller/" target="_blank">맞춤법 검사기</a>
-            <a onclick="showPage('counter', this)">글자수 계산기</a>
-            <a href="https://stdict.korean.go.kr/main/main.do" target="_blank">표준국어대사전</a>
+            <a class="brand" onclick="showPage('편친', this)">약물기호 복사</a>
+            <a href="https://nara-speller.co.kr/speller/" target="_blank">바른한글</a>
+            <a onclick="showPage('counter', this)">글자수 계산</a>
+            <a href="https://stdict.korean.go.kr/main/main.do" target="_blank">국어대사전</a>
             <a href="http://www.kpipa.or.kr/main/main.do" target="_blank">진흥원</a>
             <a href="https://www.yes24.com" target="_blank">yes24</a>
             <a href="https://chatgpt.com" target="_blank">ChatGPT</a>
@@ -194,7 +192,7 @@
                 <h1>원하는 기호를 클릭하여 복사하세요</h1>
                 <div id="default-buttons-container" class="buttons-container"></div>
                 <hr>
-                <h2>사용자 추가 버튼</h2>
+                <h2>원하는 기호를 추가하세요</h2>
                 <div id="custom-buttons-container" class="buttons-container"></div>
             </div>
             
@@ -203,12 +201,29 @@
                 <textarea id="text-input" placeholder="여기에 텍스트를 붙여넣으세요..."></textarea>
                 <div id="special-char-buttons"></div>
                 <div id="counter-results">
+                    <div class="result-item">
+                        <div class="label">공백 포함</div>
+                        <div class="count" id="char-count-space">0</div>
                     </div>
+                    <div class="result-item">
+                        <div class="label">공백 제외</div>
+                        <div class="count" id="char-count-no-space">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">단어 수</div>
+                        <div class="count" id="word-count">0</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="guide">
-            </div>
+            <p>각 문장 부호의 일반적인 쓰임새는 아래와 같습니다.</p>
+            - 겹낫표(『 』): 책 제목 (단행본, 장편 소설 등)<br/>
+            - 겹화살괄호(《 》): 신문, 잡지 등 정기 간행물<br/>
+            - 홑낫표(｢ ｣): 짧은 글 (논문, 기사, 단편 소설 등)<br/>
+            - 홑화살괄호(〈 〉): 예술 작품 (영화, 연극, 음악 등)
+        </div>
     </div>
     
     <footer>
@@ -216,19 +231,12 @@
     </footer>
 
     <script>
-        // --- 초기화 ---
         document.addEventListener("DOMContentLoaded", function() {
-            // 페이지 1: 기호 복사 기능 초기화
             initializeSymbolCopyPage();
-            
-            // 페이지 2: 글자 수 계산기 기능 초기화
             initializeCounterPage();
-            
-            // 첫 페이지 활성화
             showPage('편친', document.querySelector('#navbar a.brand'));
         });
         
-        // --- 기호 복사 페이지 관련 함수들 ---
         function initializeSymbolCopyPage() {
             const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
             const defaultContainer = document.getElementById('default-buttons-container');
@@ -236,7 +244,6 @@
                 const button = createCopyButton(char);
                 defaultContainer.appendChild(button);
             });
-            
             loadCustomButtons();
         }
 
@@ -261,7 +268,7 @@
                 removeBtn.className = 'remove-btn';
                 removeBtn.textContent = '×';
                 removeBtn.onclick = (e) => {
-                    e.stopPropagation(); // 복사 이벤트 방지
+                    e.stopPropagation();
                     removeCustomButton(char);
                 };
 
@@ -275,7 +282,7 @@
         
         function loadCustomButtons() {
             const customContainer = document.getElementById('custom-buttons-container');
-            customContainer.innerHTML = ''; // 기존 버튼 비우기
+            customContainer.innerHTML = '';
             
             const customSymbols = getCustomSymbols();
             customSymbols.forEach(char => {
@@ -300,7 +307,7 @@
                 }
                 customSymbols.push(newChar);
                 saveCustomSymbols(customSymbols);
-                loadCustomButtons(); // 목록 새로고침
+                loadCustomButtons();
             }
         }
         
@@ -308,7 +315,7 @@
             let customSymbols = getCustomSymbols();
             customSymbols = customSymbols.filter(char => char !== charToRemove);
             saveCustomSymbols(customSymbols);
-            loadCustomButtons(); // 목록 새로고침
+            loadCustomButtons();
         }
 
         function getCustomSymbols() {
@@ -319,7 +326,6 @@
             localStorage.setItem('customSymbols', JSON.stringify(symbols));
         }
 
-        // --- 글자 수 계산기 관련 함수들 ---
         function initializeCounterPage() {
             const specialChars = ['『', '』', '〈', '〉', '《', '》', '｢', '｣'];
             const specialCharButtonsContainer = document.getElementById('special-char-buttons');
@@ -331,15 +337,8 @@
             });
             
             document.getElementById('text-input').addEventListener('input', updateCounts);
-            // ... (이전과 동일한 나머지 계산기 로직) ...
         }
 
-        // --- 공통 및 유틸리티 함수들 ---
-        function copyToClipboard(char) { /* 이전과 동일 */ }
-        function showPage(pageId, element) { /* 이전과 동일 */ }
-        function updateCounts() { /* 이전과 동일 */ }
-        
-        // --- 복사/붙여넣기를 위한 원본 함수들 ---
         function copyToClipboard(char) { navigator.clipboard.writeText(char).catch(err => { console.error('클립보드 복사 실패:', err); const textarea = document.createElement('textarea'); textarea.value = char; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); }); }
         function showPage(pageId, element) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.getElementById(pageId).classList.add('active'); document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active')); if (element) { element.classList.add('active'); } }
         function updateCounts() { const text = document.getElementById('text-input').value; document.getElementById('char-count-space').textContent = text.length; const noSpaceText = text.replace(/\s/g, ''); document.getElementById('char-count-no-space').textContent = noSpaceText.length; const words = text.trim().split(/\s+/).filter(word => word !== ''); document.getElementById('word-count').textContent = words[0] === '' ? 0 : words.length; }
