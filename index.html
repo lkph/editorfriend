@@ -45,7 +45,9 @@
             margin-bottom: 30px;
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
+            /* --- 변경 사항 1: PC(기본)에서는 줄바꿈 방지 --- */
+            flex-wrap: nowrap;
+            overflow-x: auto; /* 내용이 넘칠 경우 가로 스크롤 허용 */
         }
 
         #navbar a {
@@ -57,6 +59,7 @@
             font-weight: 500;
             transition: background-color 0.3s, color 0.3s;
             cursor: pointer;
+            white-space: nowrap; /* 링크 텍스트가 줄바꿈되지 않도록 설정 */
         }
 
         #navbar a:hover, #navbar a.active {
@@ -194,14 +197,22 @@
             color: #888;
         }
 
+        /* --- 추가 사항 2: 모바일 반응형 스타일 --- */
+        @media (max-width: 820px) {
+            #navbar {
+                flex-wrap: wrap; /* 화면이 820px 이하일 때 줄바꿈 허용 */
+                overflow-x: hidden; /* 줄바꿈되므로 가로 스크롤은 필요 없음 */
+            }
+        }
+
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="navbar">
             <a class="brand" onclick="showPage('편친', this)">기호 복사</a>
-            <a href="https://nara-speller.co.kr/speller/" target="_blank">바른한글</a>
-            <a onclick="showPage('counter', this)">글자수 계산</a>
+            <a href="https://nara-speller.co.kr/speller/" target="_blank">맞춤법 검사기</a>
+            <a onclick="showPage('counter', this)">글자수 계산기</a>
             <a href="https://stdict.korean.go.kr/main/main.do" target="_blank">표준국어대사전</a>
             <a href="http://www.kpipa.or.kr/main/main.do" target="_blank">진흥원</a>
             <a href="https://www.yes24.com" target="_blank">yes24</a>
@@ -329,4 +340,3 @@
     </script>
 </body>
 </html>
-
