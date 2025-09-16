@@ -157,8 +157,21 @@
         #text-input { width: 100%; height: 200px; padding: 15px; box-sizing: border-box; border: 2px solid var(--secondary-color); border-radius: var(--border-radius); font-size: 16px; font-family: 'Noto Sans KR', sans-serif; resize: vertical; margin-bottom: 20px; }
         #special-char-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
         #special-char-buttons button { font-size: 18px; padding: 8px 15px; min-width: 50px; }
-        #counter-results { display: flex; justify-content: space-around; padding: 20px; background-color: #F7F9FC; border-radius: var(--border-radius); }
-        .result-item { text-align: center; }
+        
+        #counter-results { 
+            display: flex; 
+            justify-content: center; 
+            padding: 15px; 
+            background-color: #F7F9FC; 
+            border-radius: var(--border-radius);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .result-item { 
+            text-align: center; 
+            flex: 1 1 120px;
+            min-width: 120px;
+        }
         .result-item .label { font-size: 14px; color: #555; }
         .result-item .count { font-size: 24px; font-weight: 700; color: var(--primary-color); }
 
@@ -174,9 +187,9 @@
 <body>
     <div id="app-container">
         <div id="navbar">
-            <a class="brand" onclick="showPage('편친', this)">약물기호 복사</a>
+            <a class="brand" onclick="showPage('codecopy', this)">약물기호 복사</a>
             <a onclick="showPage('counter', this)">글자수 계산</a>
-            <a href="https://nara-speller.co.kr/speller/">바른한글</a>
+            <a href="https://nara-speller.co.kr/speller/" target="_blank">바른한글</a>
             <a href="http://www.kpipa.or.kr/main/main.do" target="_blank">진흥원</a>
             <a href="https://www.yes24.com" target="_blank">yes24</a>
             <a href="https://www.nl.go.kr/seoji/" target="_blank">ISBN</a>
@@ -184,7 +197,7 @@
         </div>
 
         <div id="content">
-            <div id="편친" class="page">
+            <div id="codecopy" class="page">
                 <h1>원하는 기호를 클릭해 복사하세요</h1>
                 <div id="symbol-buttons-container" class="buttons-container"></div>
                 <div id="add-button-container"></div>
@@ -195,12 +208,37 @@
                 <textarea id="text-input" placeholder="여기에 텍스트를 붙여넣으세요"></textarea>
                 <div id="special-char-buttons"></div>
                 <div id="counter-results">
+                    <div class="result-item">
+                        <div class="label">공백 포함</div>
+                        <div class="count" id="char-count-space">0</div>
                     </div>
+                    <div class="result-item">
+                        <div class="label">공백 제외</div>
+                        <div class="count" id="char-count-no-space">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">단어 수</div>
+                        <div class="count" id="word-count">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">200자 원고지</div>
+                        <div class="count" id="manuscript-pages">0</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="label">A4 (1400자 기준)</div>
+                        <div class="count" id="a4-pages">0</div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="guide">
-            </div>
+            <p>각 문장 부호의 일반적인 쓰임새는 아래와 같습니다.</p>
+            - 겹낫표(『 』): 책 제목 (단행본, 장편 소설 등)<br/>
+            - 겹화살괄호(《 》): 신문, 잡지 등 정기 간행물<br/>
+            - 홑낫표(｢ ｣): 짧은 글 (논문, 기사, 단편 소설 등)<br/>
+            - 홑화살괄호(〈 〉): 예술 작품 (영화, 연극, 음악 등)
+        </div>
     </div>
     
     <footer>
@@ -208,132 +246,179 @@
     </footer>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            initializeSymbolCopyPage();
-            initializeCounterPage();
-            showPage('편친', document.querySelector('#navbar a.brand'));
+    document.addEventListener("DOMContentLoaded", function() {
+        initializeSymbolCopyPage();
+        initializeCounterPage();
+        showPage('codecopy', document.querySelector('#navbar a.brand'));
+    });
+
+    // --- 약물기호 복사 페이지 관련 함수 ---
+    function initializeSymbolCopyPage() {
+        renderAllSymbolButtons();
+        renderAddButton();
+    }
+
+    function renderAllSymbolButtons() {
+        const container = document.getElementById('symbol-buttons-container');
+        container.innerHTML = '';
+
+        const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
+        const symbolNames = {
+            '『』': '겹낫표', '〈〉': '홑화살괄호', '《》': '겹화살괄호', '｢｣': '홑낫표',
+            '“”': '큰따옴표', '‘’': '작은따옴표', '·': '가운뎃점', '–': '붙임표 (En Dash)',
+            '—': '줄표 (Em Dash)', '…': '말줄임표'
+        };
+
+        defaultChars.forEach(char => {
+            const button = createCopyButton(char, false);
+            if (symbolNames[char]) button.title = symbolNames[char];
+            container.appendChild(button);
         });
-        
-        function initializeSymbolCopyPage() {
-            renderAllSymbolButtons();
-            renderAddButton();
+
+        const customSymbols = getCustomSymbols();
+        customSymbols.forEach(char => {
+            const button = createCopyButton(char, true);
+            container.appendChild(button);
+        });
+
+        const items = container.children;
+        for (let i = 5; i < items.length; i += 6) {
+            const lineBreak = document.createElement('div');
+            lineBreak.style.flexBasis = '100%';
+            lineBreak.style.height = '0';
+            items[i-1].after(lineBreak);
         }
+    }
 
-        function renderAllSymbolButtons() {
-            const container = document.getElementById('symbol-buttons-container');
-            container.innerHTML = '';
+    function renderAddButton() {
+        const addContainer = document.getElementById('add-button-container');
+        addContainer.innerHTML = '';
 
-            const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
-            const symbolNames = { /* ... 기호 이름 ... */ };
+        const addButton = document.createElement('button');
+        addButton.id = 'add-button';
+        addButton.textContent = '+ 추가';
+        addButton.onclick = addNewCustomButton;
+        addContainer.appendChild(addButton);
+    }
 
-            defaultChars.forEach(char => {
-                const button = createCopyButton(char, false); // isCustom = false
-                if (symbolNames[char]) button.title = symbolNames[char];
-                container.appendChild(button);
-            });
+    function createCopyButton(char, isCustom) {
+        const button = document.createElement('button');
+        button.textContent = char;
+        button.className = 'copy-button';
+        button.onclick = () => copyToClipboardWithFeedback(button, char);
 
-            const customSymbols = getCustomSymbols();
-            customSymbols.forEach(char => {
-                const button = createCopyButton(char, true); // isCustom = true
-                container.appendChild(button);
-            });
-
-            const items = container.children;
-            for (let i = 5; i < items.length; i += 6) {
-                const lineBreak = document.createElement('div');
-                lineBreak.style.flexBasis = '100%';
-                lineBreak.style.height = '0';
-                items[i-1].after(lineBreak);
-            }
-        }
-
-        function renderAddButton() {
-            const addContainer = document.getElementById('add-button-container');
-            addContainer.innerHTML = '';
-
-            const addButton = document.createElement('button');
-            addButton.id = 'add-button';
-            addButton.textContent = '+ 추가';
-            addButton.onclick = addNewCustomButton;
-            addContainer.appendChild(addButton);
-        }
-
-        function createCopyButton(char, isCustom) {
-            const button = document.createElement('button');
-            button.textContent = char;
-            button.className = 'copy-button';
-            button.onclick = () => copyToClipboardWithFeedback(button, char);
-
-            if (isCustom) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'custom-button-wrapper';
-                
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'remove-btn';
-                removeBtn.textContent = '×';
-                removeBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    removeCustomButton(char);
-                };
-
-                wrapper.appendChild(button);
-                wrapper.appendChild(removeBtn);
-                return wrapper;
-            }
+        if (isCustom) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'custom-button-wrapper';
             
-            return button;
-        }
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = '×';
+            removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                removeCustomButton(char);
+            };
 
-        function addNewCustomButton() {
-            const newChar = prompt("추가할 기호나 단어를 입력하세요:");
-            if (newChar && newChar.trim() !== '') {
-                const customSymbols = getCustomSymbols();
-                if (customSymbols.includes(newChar)) {
-                    alert('이미 등록된 버튼입니다.');
-                    return;
-                }
-                customSymbols.push(newChar);
-                saveCustomSymbols(customSymbols);
-                renderAllSymbolButtons();
-            }
+            wrapper.appendChild(button);
+            wrapper.appendChild(removeBtn);
+            return wrapper;
         }
         
-        function removeCustomButton(charToRemove) {
-            let customSymbols = getCustomSymbols();
-            customSymbols = customSymbols.filter(char => char !== charToRemove);
+        return button;
+    }
+
+    function addNewCustomButton() {
+        const newChar = prompt("추가할 기호나 단어를 입력하세요:");
+        if (newChar && newChar.trim() !== '') {
+            const customSymbols = getCustomSymbols();
+            if (customSymbols.includes(newChar)) {
+                alert('이미 등록된 버튼입니다.');
+                return;
+            }
+            customSymbols.push(newChar);
             saveCustomSymbols(customSymbols);
             renderAllSymbolButtons();
         }
+    }
+    
+    function removeCustomButton(charToRemove) {
+        let customSymbols = getCustomSymbols();
+        customSymbols = customSymbols.filter(char => char !== charToRemove);
+        saveCustomSymbols(customSymbols);
+        renderAllSymbolButtons();
+    }
 
-        function getCustomSymbols() {
-            return JSON.parse(localStorage.getItem('customSymbols') || '[]');
-        }
+    function getCustomSymbols() {
+        return JSON.parse(localStorage.getItem('customSymbols') || '[]');
+    }
 
-        function saveCustomSymbols(symbols) {
-            localStorage.setItem('customSymbols', JSON.stringify(symbols));
-        }
+    function saveCustomSymbols(symbols) {
+        localStorage.setItem('customSymbols', JSON.stringify(symbols));
+    }
+    
+    function copyToClipboardWithFeedback(buttonElement, text) {
+        copyToClipboard(text);
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = '복사!';
+        setTimeout(() => {
+            buttonElement.textContent = originalText;
+        }, 1000);
+    }
+
+    // --- 글자수 계산기 관련 함수 ---
+    function initializeCounterPage() {
+        const specialChars = ['『', '』', '〈', '〉', '《', '》', '｢', '｣'];
+        const specialCharButtonsContainer = document.getElementById('special-char-buttons');
+        specialChars.forEach(char => {
+            const button = document.createElement('button');
+            button.textContent = char;
+            button.onclick = () => copyToClipboard(char);
+            specialCharButtonsContainer.appendChild(button);
+        });
+        document.getElementById('text-input').addEventListener('input', updateCounts);
+        updateCounts(); // 페이지 로드 시 한 번 실행하여 0으로 초기화
+    }
+
+    function updateCounts() {
+        const text = document.getElementById('text-input').value;
+        const charCountWithSpace = text.length;
+
+        document.getElementById('char-count-space').textContent = charCountWithSpace;
         
-        function copyToClipboardWithFeedback(buttonElement, text) {
-            copyToClipboard(text);
-            const originalText = buttonElement.textContent;
-            buttonElement.textContent = '복사!';
-            setTimeout(() => {
-                buttonElement.textContent = originalText;
-            }, 1000);
-        }
-
-        // --- 나머지 함수들은 이전과 동일 ---
-        function initializeCounterPage() { /* ... */ }
-        function copyToClipboard(char) { /* ... */ }
-        function showPage(pageId, element) { /* ... */ }
-        function updateCounts() { /* ... */ }
+        const noSpaceText = text.replace(/\s/g, '');
+        document.getElementById('char-count-no-space').textContent = noSpaceText.length;
         
-        // --- 전체 함수 코드 (복사/붙여넣기용) ---
-        function initializeCounterPage(){const specialChars=['『','』','〈','〉','《','》','｢','｣'];const specialCharButtonsContainer=document.getElementById('special-char-buttons');specialChars.forEach(char=>{const button=document.createElement('button');button.textContent=char;button.onclick=()=>copyToClipboard(char);specialCharButtonsContainer.appendChild(button);});document.getElementById('text-input').addEventListener('input',updateCounts);}
-        function copyToClipboard(char){navigator.clipboard.writeText(char).catch(err=>{console.error('클립보드 복사 실패:',err);const textarea=document.createElement('textarea');textarea.value=char;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);});}
-        function showPage(pageId,element){document.querySelectorAll('.page').forEach(page=>page.classList.remove('active'));document.getElementById(pageId).classList.add('active');document.querySelectorAll('#navbar a').forEach(a=>a.classList.remove('active'));if(element){element.classList.add('active');}}
-        function updateCounts(){const text=document.getElementById('text-input').value;document.getElementById('char-count-space').textContent=text.length;const noSpaceText=text.replace(/\s/g,'');document.getElementById('char-count-no-space').textContent=noSpaceText.length;const words=text.trim().split(/\s+/).filter(word=>word!=='');document.getElementById('word-count').textContent=words[0]===''?0:words.length;}
-    </script>
+        const words = text.trim().split(/\s+/).filter(word => word !== '');
+        document.getElementById('word-count').textContent = words[0] === '' ? 0 : words.length;
+
+        const manuscriptPages = Math.ceil(charCountWithSpace / 200);
+        document.getElementById('manuscript-pages').textContent = manuscriptPages;
+
+        const a4Pages = Math.ceil(charCountWithSpace / 1400);
+        document.getElementById('a4-pages').textContent = a4Pages;
+    }
+
+    // --- 공통 함수 ---
+    function copyToClipboard(char) {
+        navigator.clipboard.writeText(char).catch(err => {
+            console.error('클립보드 복사 실패:', err);
+            const textarea = document.createElement('textarea');
+            textarea.value = char;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        });
+    }
+
+    function showPage(pageId, element) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active'));
+        if (element) {
+            element.classList.add('active');
+        }
+    }
+</script>
 </body>
 </html>
-
