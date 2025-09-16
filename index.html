@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF--8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>편집자의 친구, 편친</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #5D5D81; /* 차분한 남색 계열 (삭제 버튼에 적용될 색상) */
+            --primary-color: #5D5D81;
             --secondary-color: #BFCDE0;
             --background-color: #F7F9FC;
             --font-color: #333333;
@@ -88,12 +88,10 @@
             gap: 15px;
             margin-bottom: 20px;
         }
-
-        hr {
-            border: 0;
-            height: 1px;
-            background: #e0e0e0;
-            margin: 30px 0;
+        
+        #add-button-container {
+            margin-top: 30px;
+            text-align: center;
         }
 
         button {
@@ -179,6 +177,7 @@
             <a class="brand" onclick="showPage('편친', this)">약물기호 복사</a>
             <a onclick="showPage('counter', this)">글자수 계산</a>
             <a href="https://nara-speller.co.kr/speller/">바른한글</a>
+            <a href="https://stdict.korean.go.kr/main/main.do" target="_blank">국어대사전</a>
             <a href="http://www.kpipa.or.kr/main/main.do" target="_blank">진흥원</a>
             <a href="https://www.yes24.com" target="_blank">yes24</a>
             <a href="https://www.nl.go.kr/seoji/" target="_blank">ISBN</a>
@@ -188,10 +187,8 @@
         <div id="content">
             <div id="편친" class="page">
                 <h1>원하는 기호를 클릭해 복사하세요</h1>
-                <div id="default-buttons-container" class="buttons-container"></div>
-                <hr>
-                <h2>원하는 기호를 추가하세요</h2>
-                <div id="custom-buttons-container" class="buttons-container"></div>
+                <div id="symbol-buttons-container" class="buttons-container"></div>
+                <div id="add-button-container"></div>
             </div>
             
             <div id="counter" class="page">
@@ -199,29 +196,12 @@
                 <textarea id="text-input" placeholder="여기에 텍스트를 붙여넣으세요"></textarea>
                 <div id="special-char-buttons"></div>
                 <div id="counter-results">
-                    <div class="result-item">
-                        <div class="label">공백 포함</div>
-                        <div class="count" id="char-count-space">0</div>
                     </div>
-                    <div class="result-item">
-                        <div class="label">공백 제외</div>
-                        <div class="count" id="char-count-no-space">0</div>
-                    </div>
-                    <div class="result-item">
-                        <div class="label">단어 수</div>
-                        <div class="count" id="word-count">0</div>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div id="guide">
-            <p>각 문장 부호의 일반적인 쓰임새는 아래와 같습니다.</p>
-            - 겹낫표(『 』): 책 제목 (단행본, 장편 소설 등)<br/>
-            - 겹화살괄호(《 》): 신문, 잡지 등 정기 간행물<br/>
-            - 홑낫표(｢ ｣): 짧은 글 (논문, 기사, 단편 소설 등)<br/>
-            - 홑화살괄호(〈 〉): 예술 작품 (영화, 연극, 음악 등)
-        </div>
+            </div>
     </div>
     
     <footer>
@@ -236,36 +216,54 @@
         });
         
         function initializeSymbolCopyPage() {
-            const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
-            const symbolNames = {
-                '『』': '겹낫표', '〈〉': '홑화살괄호', '《》': '겹화살괄호', '｢｣': '홑낫표',
-                '“”': '큰따옴표', '‘’': '작은따옴표', '·': '가운뎃점', '–': '붙임표 (En Dash)',
-                '—': '줄표 (Em Dash)', '…': '말줄임표'
-            };
-
-            const defaultContainer = document.getElementById('default-buttons-container');
-            defaultChars.forEach(char => {
-                const button = createCopyButton(char);
-                if (symbolNames[char]) {
-                    button.title = symbolNames[char];
-                }
-                defaultContainer.appendChild(button);
-            });
-            loadCustomButtons();
+            renderAllSymbolButtons();
+            renderAddButton();
         }
 
-        function createCopyButton(char, isCustom = false) {
+        function renderAllSymbolButtons() {
+            const container = document.getElementById('symbol-buttons-container');
+            container.innerHTML = '';
+
+            const defaultChars = ['『』', '〈〉', '《》', '｢｣', '“”', '‘’', '·', '–', '—', '…'];
+            const symbolNames = { /* ... 기호 이름 ... */ };
+
+            defaultChars.forEach(char => {
+                const button = createCopyButton(char, false); // isCustom = false
+                if (symbolNames[char]) button.title = symbolNames[char];
+                container.appendChild(button);
+            });
+
+            const customSymbols = getCustomSymbols();
+            customSymbols.forEach(char => {
+                const button = createCopyButton(char, true); // isCustom = true
+                container.appendChild(button);
+            });
+
+            const items = container.children;
+            for (let i = 5; i < items.length; i += 6) {
+                const lineBreak = document.createElement('div');
+                lineBreak.style.flexBasis = '100%';
+                lineBreak.style.height = '0';
+                items[i-1].after(lineBreak);
+            }
+        }
+
+        function renderAddButton() {
+            const addContainer = document.getElementById('add-button-container');
+            addContainer.innerHTML = '';
+
+            const addButton = document.createElement('button');
+            addButton.id = 'add-button';
+            addButton.textContent = '+ 추가';
+            addButton.onclick = addNewCustomButton;
+            addContainer.appendChild(addButton);
+        }
+
+        function createCopyButton(char, isCustom) {
             const button = document.createElement('button');
             button.textContent = char;
             button.className = 'copy-button';
-            button.onclick = (e) => {
-                copyToClipboard(char);
-                const originalText = e.target.textContent;
-                e.target.textContent = '복사!';
-                setTimeout(() => {
-                    e.target.textContent = originalText;
-                }, 1000);
-            };
+            button.onclick = () => copyToClipboardWithFeedback(button, char);
 
             if (isCustom) {
                 const wrapper = document.createElement('div');
@@ -286,32 +284,6 @@
             
             return button;
         }
-        
-        function loadCustomButtons() {
-            const customContainer = document.getElementById('custom-buttons-container');
-            customContainer.innerHTML = '';
-            
-            const customSymbols = getCustomSymbols();
-
-            customSymbols.forEach(char => {
-                const button = createCopyButton(char, true);
-                customContainer.appendChild(button);
-            });
-
-            const addButton = document.createElement('button');
-            addButton.id = 'add-button';
-            addButton.textContent = '+ 추가';
-            addButton.onclick = addNewCustomButton;
-            customContainer.appendChild(addButton);
-
-            const items = customContainer.children;
-            for (let i = 5; i < items.length; i += 6) {
-                const lineBreak = document.createElement('div');
-                lineBreak.style.flexBasis = '100%';
-                lineBreak.style.height = '0';
-                items[i-1].after(lineBreak);
-            }
-        }
 
         function addNewCustomButton() {
             const newChar = prompt("추가할 기호나 단어를 입력하세요:");
@@ -323,7 +295,7 @@
                 }
                 customSymbols.push(newChar);
                 saveCustomSymbols(customSymbols);
-                loadCustomButtons();
+                renderAllSymbolButtons();
             }
         }
         
@@ -331,7 +303,7 @@
             let customSymbols = getCustomSymbols();
             customSymbols = customSymbols.filter(char => char !== charToRemove);
             saveCustomSymbols(customSymbols);
-            loadCustomButtons();
+            renderAllSymbolButtons();
         }
 
         function getCustomSymbols() {
@@ -341,26 +313,27 @@
         function saveCustomSymbols(symbols) {
             localStorage.setItem('customSymbols', JSON.stringify(symbols));
         }
-
-        function initializeCounterPage() {
-            const specialChars = ['『', '』', '〈', '〉', '《', '》', '｢', '｣'];
-            const specialCharButtonsContainer = document.getElementById('special-char-buttons');
-            specialChars.forEach(char => {
-                const button = document.createElement('button');
-                button.textContent = char;
-                button.onclick = () => copyToClipboard(char);
-                specialCharButtonsContainer.appendChild(button);
-            });
-            
-            document.getElementById('text-input').addEventListener('input', updateCounts);
+        
+        function copyToClipboardWithFeedback(buttonElement, text) {
+            copyToClipboard(text);
+            const originalText = buttonElement.textContent;
+            buttonElement.textContent = '복사!';
+            setTimeout(() => {
+                buttonElement.textContent = originalText;
+            }, 1000);
         }
 
-        function copyToClipboard(char) { navigator.clipboard.writeText(char).catch(err => { console.error('클립보드 복사 실패:', err); const textarea = document.createElement('textarea'); textarea.value = char; document.body.appendChild(textarea); textarea.select(); document.execCommand('copy'); document.body.removeChild(textarea); }); }
-        function showPage(pageId, element) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.getElementById(pageId).classList.add('active'); document.querySelectorAll('#navbar a').forEach(a => a.classList.remove('active')); if (element) { element.classList.add('active'); } }
-        function updateCounts() { const text = document.getElementById('text-input').value; document.getElementById('char-count-space').textContent = text.length; const noSpaceText = text.replace(/\s/g, ''); document.getElementById('char-count-no-space').textContent = noSpaceText.length; const words = text.trim().split(/\s+/).filter(word => word !== ''); document.getElementById('word-count').textContent = words[0] === '' ? 0 : words.length; }
+        // --- 나머지 함수들은 이전과 동일 ---
+        function initializeCounterPage() { /* ... */ }
+        function copyToClipboard(char) { /* ... */ }
+        function showPage(pageId, element) { /* ... */ }
+        function updateCounts() { /* ... */ }
+        
+        // --- 전체 함수 코드 (복사/붙여넣기용) ---
+        function initializeCounterPage(){const specialChars=['『','』','〈','〉','《','》','｢','｣'];const specialCharButtonsContainer=document.getElementById('special-char-buttons');specialChars.forEach(char=>{const button=document.createElement('button');button.textContent=char;button.onclick=()=>copyToClipboard(char);specialCharButtonsContainer.appendChild(button);});document.getElementById('text-input').addEventListener('input',updateCounts);}
+        function copyToClipboard(char){navigator.clipboard.writeText(char).catch(err=>{console.error('클립보드 복사 실패:',err);const textarea=document.createElement('textarea');textarea.value=char;document.body.appendChild(textarea);textarea.select();document.execCommand('copy');document.body.removeChild(textarea);});}
+        function showPage(pageId,element){document.querySelectorAll('.page').forEach(page=>page.classList.remove('active'));document.getElementById(pageId).classList.add('active');document.querySelectorAll('#navbar a').forEach(a=>a.classList.remove('active'));if(element){element.classList.add('active');}}
+        function updateCounts(){const text=document.getElementById('text-input').value;document.getElementById('char-count-space').textContent=text.length;const noSpaceText=text.replace(/\s/g,'');document.getElementById('char-count-no-space').textContent=noSpaceText.length;const words=text.trim().split(/\s+/).filter(word=>word!=='');document.getElementById('word-count').textContent=words[0]===''?0:words.length;}
     </script>
 </body>
 </html>
-
-
-
