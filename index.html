@@ -4,12 +4,22 @@
 
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-DP9XRRXMWW"></script>
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-DP9XRRXMWW');
+  
+  // 외부 링크 클릭 추적
+  document.addEventListener('click', function(e) {
+    if (e.target.tagName === 'A' && e.target.href && e.target.hostname !== window.location.hostname) {
+      gtag('event', 'click', {
+        'event_category': 'outbound',
+        'event_label': e.target.href
+      });
+    }
+  });
 </script>
     
     <meta charset="UTF-8">
@@ -252,9 +262,13 @@
         </div>
     </div>
     
-    <footer>
-        <p>Copyright &copy; 2024. leekim publishing house. All rights reserved.<br><strong>편집자의 친구, 편친</strong></p>
-    </footer>
+<footer>
+    
+    <p>Copyright &copy; 2024. 이김(leekim publishing house). All rights reserved.</p>
+    <p><strong>편집자의 친구, 편친</strong> | 
+    <a href="https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=372489593" target="_blank" style="color: #888; text-decoration: none; font-size: 13px;">
+    『생명의 여정』(신간)</a> | <strong><a href="https://x.com/leekim_editor" target="_blank" style="color: #5D5D81;">twitter</a></strong></p>
+</footer>
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -433,6 +447,5 @@
 </script>
 </body>
 </html>
-
 
 
